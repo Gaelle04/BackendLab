@@ -1,5 +1,6 @@
 using BackendLab.Api.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using BackendLab;
 
 namespace BackendLab.Api.Controllers;
@@ -21,5 +22,14 @@ public class StudentsController : ControllerBase
     public ActionResult<IEnumerable<Student>> GetStudents()
     {
         return Ok(_students);
+    }
+    
+    
+   
+    [HttpGet("{id}")]
+    public ActionResult<Student> GetStudent(int id)
+    {
+        var student = _students.FirstOrDefault(s => s.id == id); 
+        return student is null ? NotFound() : Ok(student);
     }
 }
