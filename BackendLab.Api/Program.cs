@@ -1,12 +1,12 @@
 using BackendLab.Api.Models;
-
+using BackendLab.Api.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
+builder.Services.AddControllers();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -16,19 +16,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-List<Student> students = new List<Student>();
-
-students.Add(new Student(1, "gaelle", "gaelle@gmail.com"));
-students.Add(new Student(2, "chloe", "chloe@gmail.com"));
-students.Add(new Student(3, "chris", "chris@gmail.com"));
-students.Add(new Student(4, "John", "John@gmail.com"));
-
-app.MapGet("/students/api", () => Results.Ok(students))
-    .WithName("GetAllStudents")
-    .WithDescription("Get the list of all students")
-    .WithSummary("Get all students");
-
+app.MapControllers();
 
 app.Run();
 
