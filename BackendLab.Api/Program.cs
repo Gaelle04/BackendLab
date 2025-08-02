@@ -17,12 +17,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var students = new List<Student>();
+List<Student> students = new List<Student>();
 
 students.Add(new Student(1, "gaelle", "gaelle@gmail.com"));
 students.Add(new Student(2, "chloe", "chloe@gmail.com"));
 students.Add(new Student(3, "chris", "chris@gmail.com"));
 students.Add(new Student(4, "John", "John@gmail.com"));
+
+app.MapGet("/students/api", () => Results.Ok(students))
+    .WithName("GetAllStudents")
+    .WithDescription("Get the list of all students")
+    .WithSummary("Get all students");
 
 
 app.Run();

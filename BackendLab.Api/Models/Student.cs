@@ -17,9 +17,9 @@ public class Student
 
     public Student(long id, string name, string email)
     {
-        id = this.id;
-        name = this.name;
-        email = this.email;
+        this.id = id;
+        this.name = name;
+        this.email = email;
         
     }
 }
