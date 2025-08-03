@@ -115,6 +115,21 @@ public class StudentsController : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+
+    [HttpDelete("{id:long}")]
+    public IActionResult DeleteById([FromRoute] long id)
+    {
+        if (id <= 0)
+            return BadRequest("Id must be greater than or equal to zero");
+        var student = _students.FirstOrDefault(s => s.id == id);
+
+        if (student is null)
+            return NotFound();
+        
+        _students.Remove(student);
+        return Ok(student);
+
     }
+}
 
 
