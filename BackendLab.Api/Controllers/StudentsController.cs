@@ -10,7 +10,7 @@ namespace BackendLab.Api.Controllers;
 public class StudentsController : ControllerBase
 {
     
-    private List<Student> _students = new()
+    private static List<Student> _students = new()
     {
         new Student(1, "gaelle", "gaelle@gmail.com"),
         new Student(2, "chloe", "chloe@gmail.com"),
@@ -68,6 +68,17 @@ public class StudentsController : ControllerBase
        
         var formattedDate = DateTime.Now.ToString("D", culture); 
         return Ok(new { CurrentDate = formattedDate, AcceptLanguageUsed = culture.Name });
+    }
+
+    [HttpPost("rename")]
+    public ActionResult<Student> Rename([FromBody] UpdatedStudent body)
+    {
+        var student = _students.FirstOrDefault(s => s.id == body.id);
+        if(student is null) 
+            return NotFound();
+        
+        student.name = body.newName;
+        return Ok(student);
     }
 }
 
