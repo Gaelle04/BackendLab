@@ -3,26 +3,22 @@ using BackendLab.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-
+using BackendLab.Api.Services;
 namespace BackendLab.Api.Controllers;
+
+
 [ApiController]
 [Route("api/[controller]")]
 public class StudentsController : ControllerBase
 {
     
-    private static List<Student> _students = new()
-    {
-        new Student(1, "gaelle", "gaelle@gmail.com"),
-        new Student(2, "chloe", "chloe@gmail.com"),
-        new Student(3, "chris", "chris@gmail.com"),
-        new Student(4, "John", "John@gmail.com")
-        
-    };
-    
+ private readonly IStudentService _students;
+ public StudentsController(IStudentService students) => _students = students;
+ 
     [HttpGet()]
     public ActionResult<IEnumerable<Student>> GetStudents()
     {
-        return Ok(_students);
+        return Ok(_students.GetAll());
     }
     
     
@@ -33,7 +29,7 @@ public class StudentsController : ControllerBase
         
         if(id <=0)
             throw new ArgumentOutOfRangeException(nameof(id), "id must be greater than zero");
-        var student = _students.FirstOrDefault(s => s.id == id); 
+        var student = _students.GetById(id); 
         return student is null ? NotFound() : Ok(student);
     }
     
@@ -43,7 +39,7 @@ public class StudentsController : ControllerBase
         if(string.IsNullOrEmpty(value))
             throw new ArgumentNullException(nameof(value), "Query 'value' is required.");
         
-        var results =_students.Where(s => s.name.Contains(value, StringComparison.OrdinalIgnoreCase)).ToList(); 
+        var results =_students.GetByValue(value).ToList(); 
         return results.Count== 0 ? NotFound() : Ok(results);
     }
     
@@ -93,12 +89,8 @@ public class StudentsController : ControllerBase
         if(body.id < 0)
             throw new ArgumentOutOfRangeException(nameof(body), "id must be greater than zero");
         
-        var student = _students.FirstOrDefault(s => s.id == body.id);
-        if(student is null) 
-            return NotFound();
-        
-        student.name = body.newName;
-        return Ok(student);
+        var student = _students.Rename(body.id, body.newName);
+        return student is null ? NotFound() : Ok(student);
     }
 
     [HttpPost("upload")]
@@ -146,13 +138,10 @@ public class StudentsController : ControllerBase
            throw new ArgumentOutOfRangeException(nameof(id), "id must be greater than zero");
      
          
-       var student = _students.FirstOrDefault(s => s.id == id);
+       var studentDeleted = _students.Delete(id);
+       return studentDeleted is null ? NotFound() : Ok(studentDeleted);
 
-        if (student is null)
-            return NotFound();
-        
-        _students.Remove(student);
-        return Ok(student);
+       
 
     }
 }
