@@ -1,8 +1,8 @@
 using System.Globalization;
 using BackendLab.Api.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using BackendLab;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace BackendLab.Api.Controllers;
 [ApiController]
@@ -80,5 +80,41 @@ public class StudentsController : ControllerBase
         student.name = body.newName;
         return Ok(student);
     }
-}
+
+    [HttpPost("upload")]
+    public async Task<IActionResult> UploadImage([FromForm] IFormFile image)
+    {
+        if (image is null || image.Length == 0)
+            return BadRequest("No file was uploaded.");
+        try
+        {
+            // Define the path within wwwroot
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(),"wwwroot","uploads");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+            
+            // Generate a safe filename 
+            var extension = Path.GetExtension(image.FileName);
+            var fileName = $"{Guid.NewGuid()}{extension}".ToLowerInvariant();
+            var filePath = Path.Combine(uploadsFolder, fileName);
+            
+            // Save the image to the specified path
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            }
+            
+            // Return the URL or path to the uploaded image
+            var imageUrl =$"{Request.Scheme}://{Request.Host}/uploads/{fileName}";
+            return Ok(new { Message = "Image uploaded successfully", ImageUrl = imageUrl });
+        }
+        catch (System.Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+    }
+
 
