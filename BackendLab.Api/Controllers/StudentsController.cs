@@ -1,3 +1,4 @@
+using System.Globalization;
 using BackendLab.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -39,4 +40,34 @@ public class StudentsController : ControllerBase
         var results =_students.Where(s => s.name.Contains(value, StringComparison.OrdinalIgnoreCase)).ToList(); 
         return results.Count== 0 ? NotFound() : Ok(results);
     }
+    
+    [HttpGet("current-date")]
+    public IActionResult GetCurrentDate()
+    {
+        
+        var acceptLanguageHeader = Request.Headers["Accept-Language"].ToString();
+        CultureInfo culture = CultureInfo.InvariantCulture;
+        if (!string.IsNullOrEmpty(acceptLanguageHeader))
+        {
+            try
+            {
+                var languages = acceptLanguageHeader.Split(',')
+                    .Select(l => l.Trim().Split(';')[0])
+                    .ToList();
+                if (languages.Any())
+                {
+                    culture = new CultureInfo(languages[0]); 
+                }
+            }
+            catch (CultureNotFoundException)
+            {
+              
+            }
+        }
+
+       
+        var formattedDate = DateTime.Now.ToString("D", culture); 
+        return Ok(new { CurrentDate = formattedDate, AcceptLanguageUsed = culture.Name });
+    }
 }
+
