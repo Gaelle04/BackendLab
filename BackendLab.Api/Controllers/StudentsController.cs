@@ -26,10 +26,17 @@ public class StudentsController : ControllerBase
     
     
    
-    [HttpGet("{id}")]
-    public ActionResult<Student> GetStudent(int id)
+    [HttpGet("by-id/{id}")]
+    public ActionResult<IEnumerable<Student>> GetStudent([FromRoute]int id)
     {
         var student = _students.FirstOrDefault(s => s.id == id); 
         return student is null ? NotFound() : Ok(student);
+    }
+    
+    [HttpGet("by-value")]
+    public ActionResult<IEnumerable<Student>> GetStudentByValue([FromQuery]string value)
+    {
+        var results =_students.Where(s => s.name.Contains(value, StringComparison.OrdinalIgnoreCase)).ToList(); 
+        return results.Count== 0 ? NotFound() : Ok(results);
     }
 }
