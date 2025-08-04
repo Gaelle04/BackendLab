@@ -22,9 +22,16 @@ builder.Services.AddMediatR(typeof(Program));
 builder.Services.AddDbContext<BackendLabDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(9, 3, 0))));
+
+builder.Services.AddDbContext<BackendLabDbContextCodeFirst>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

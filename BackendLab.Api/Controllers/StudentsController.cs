@@ -17,9 +17,9 @@ public class StudentsController : ControllerBase
 {
     
  private readonly IStudentService _students;
- private readonly BackendLabDbContext _context;
+ private readonly BackendLabDbContextCodeFirst _context;
 
- public StudentsController(IStudentService students, IMediator mediator, BackendLabDbContext context)
+ public StudentsController(IStudentService students, IMediator mediator, BackendLabDbContextCodeFirst context)
  {
      _students = students;
      _mediator = mediator;
