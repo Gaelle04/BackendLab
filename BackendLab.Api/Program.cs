@@ -3,6 +3,8 @@ using BackendLab.Api.Controllers;
 using BackendLab.Api.Services; 
 using BackendLab.Api.Middleware;
 using BackendLab.Api.Filters;
+using MediatR;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,7 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<HeaderFilter>();
 });
+builder.Services.AddMediatR(typeof(Program));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

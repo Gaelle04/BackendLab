@@ -3,7 +3,10 @@ using BackendLab.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.IO;
+using BackendLab.Api.Features.Students.Queries;
 using BackendLab.Api.Services;
+using MediatR;
+
 namespace BackendLab.Api.Controllers;
 
 
@@ -13,7 +16,12 @@ public class StudentsController : ControllerBase
 {
     
  private readonly IStudentService _students;
- public StudentsController(IStudentService students) => _students = students;
+
+ public StudentsController(IStudentService students, IMediator mediator)
+ {
+     _students = students;
+     _mediator = mediator;
+ } 
  
     [HttpGet()]
     public ActionResult<IEnumerable<Student>> GetStudents()
@@ -21,26 +29,28 @@ public class StudentsController : ControllerBase
         return Ok(_students.GetAll());
     }
     
-    
+    private readonly IMediator _mediator;
+   
    
     [HttpGet("by-id/{id}")]
-    public ActionResult<IEnumerable<Student>> GetStudent([FromRoute]int id)
+    public async Task<ActionResult> GetStudent([FromRoute]long id)
     {
         
         if(id <=0)
             throw new ArgumentOutOfRangeException(nameof(id), "id must be greater than zero");
-        var student = _students.GetById(id); 
+        
+        var student = await _mediator.Send(new GetStudentById(id)); 
         return student is null ? NotFound() : Ok(student);
     }
     
     [HttpGet("by-value")]
-    public ActionResult<IEnumerable<Student>> GetStudentByValue([FromQuery]string value)
+    public async Task<ActionResult> GetStudentByValue([FromQuery]string value)
     {
         if(string.IsNullOrEmpty(value))
             throw new ArgumentNullException(nameof(value), "Query 'value' is required.");
         
-        var results =_students.GetByValue(value).ToList(); 
-        return results.Count== 0 ? NotFound() : Ok(results);
+        var results = await _mediator.Send(new GetStudentByValue(value)); 
+        return Ok(results);
     }
     
     [HttpGet("current-date")]
