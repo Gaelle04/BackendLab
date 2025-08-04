@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BackendLab.Api.Models;
 
-public class Student
+public class OldStudent
 {
     [Required(ErrorMessage ="Please enter your id")]
 
@@ -15,7 +15,7 @@ public class Student
     [EmailAddress(ErrorMessage ="Please enter your email")]
     public string email { get; set; }
 
-    public Student(long id, string name, string email)
+    public OldStudent(long id, string name, string email)
     {
         this.id = id;
         this.name = name;

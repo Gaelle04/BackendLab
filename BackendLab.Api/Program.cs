@@ -5,6 +5,7 @@ using BackendLab.Api.Middleware;
 using BackendLab.Api.Filters;
 using MediatR;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,9 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<HeaderFilter>();
 });
 builder.Services.AddMediatR(typeof(Program));
+builder.Services.AddDbContext<BackendLabDbContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(9, 3, 0))));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

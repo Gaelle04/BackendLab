@@ -2,7 +2,7 @@ namespace BackendLab.Api.Features.Students.Queries;
 using BackendLab.Api.Models;
 using MediatR;
 
-public class GetStudentById: IRequest<Student?>
+public class GetStudentById: IRequest<OldStudent?>
 {
     public long Id { get; set; }
 

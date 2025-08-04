@@ -5,7 +5,7 @@ using MediatR;
 
 namespace BackendLab.Api.Features.Students.Handlers;
 
-public class GetStudentByIdHandler: IRequestHandler<GetStudentById, Student?>
+public class GetStudentByIdHandler: IRequestHandler<GetStudentById, OldStudent?>
 {
     private readonly IStudentService _studentService;
 
@@ -14,7 +14,7 @@ public class GetStudentByIdHandler: IRequestHandler<GetStudentById, Student?>
         _studentService = studentService;
     }
 
-    public Task<Student?> Handle(GetStudentById request, CancellationToken cancellationToken)
+    public Task<OldStudent?> Handle(GetStudentById request, CancellationToken cancellationToken)
     {
         var student = _studentService.GetById(request.Id);
         return Task.FromResult(student);

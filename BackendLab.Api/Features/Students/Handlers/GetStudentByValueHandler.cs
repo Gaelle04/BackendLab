@@ -5,7 +5,7 @@ using MediatR;
 
 namespace BackendLab.Api.Features.Students.Handlers;
 
-public class GetStudentByValueHandler : IRequestHandler<GetStudentByValue, IEnumerable<Student>>
+public class GetStudentByValueHandler : IRequestHandler<GetStudentByValue, IEnumerable<OldStudent>>
 {
     private readonly IStudentService _studentService;
 
@@ -15,9 +15,9 @@ public class GetStudentByValueHandler : IRequestHandler<GetStudentByValue, IEnum
         _studentService = studentService;
     }
 
-    public Task<IEnumerable<Student>> Handle(GetStudentByValue request, CancellationToken cancellationToken)
+    public Task<IEnumerable<OldStudent>> Handle(GetStudentByValue request, CancellationToken cancellationToken)
     {
         var results = _studentService.GetByValue(request.Value);
-        return Task.FromResult<IEnumerable<Student>>(results);
+        return Task.FromResult<IEnumerable<OldStudent>>(results);
     }
 }

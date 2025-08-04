@@ -6,6 +6,7 @@ using System.IO;
 using BackendLab.Api.Features.Students.Queries;
 using BackendLab.Api.Services;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackendLab.Api.Controllers;
 
@@ -16,17 +17,22 @@ public class StudentsController : ControllerBase
 {
     
  private readonly IStudentService _students;
+ private readonly BackendLabDbContext _context;
 
- public StudentsController(IStudentService students, IMediator mediator)
+ public StudentsController(IStudentService students, IMediator mediator, BackendLabDbContext context)
  {
      _students = students;
      _mediator = mediator;
+     _context = context;
  } 
  
     [HttpGet()]
-    public ActionResult<IEnumerable<Student>> GetStudents()
+    public async Task<ActionResult<IEnumerable<Student>>> GetStudents()
     {
-        return Ok(_students.GetAll());
+        var students = await _context.Students
+            .OrderBy(s=>s.Name)
+            .ToListAsync();
+        return Ok(students);
     }
     
     private readonly IMediator _mediator;
@@ -39,7 +45,7 @@ public class StudentsController : ControllerBase
         if(id <=0)
             throw new ArgumentOutOfRangeException(nameof(id), "id must be greater than zero");
         
-        var student = await _mediator.Send(new GetStudentById(id)); 
+        var student =  await _context.Students.FirstOrDefaultAsync(s => s.Id == id); 
         return student is null ? NotFound() : Ok(student);
     }
     
@@ -49,7 +55,9 @@ public class StudentsController : ControllerBase
         if(string.IsNullOrEmpty(value))
             throw new ArgumentNullException(nameof(value), "Query 'value' is required.");
         
-        var results = await _mediator.Send(new GetStudentByValue(value)); 
+        var results = await _context.Students
+            .Where(s => s.Name.Contains(value))
+            .ToListAsync();
         return Ok(results);
     }
     
@@ -91,7 +99,7 @@ public class StudentsController : ControllerBase
     }
 
     [HttpPost("rename")]
-    public ActionResult<Student> Rename([FromBody] UpdatedStudent body)
+    public ActionResult<OldStudent> Rename([FromBody] UpdatedStudent body)
     {
         
         if(body == null)
@@ -142,16 +150,20 @@ public class StudentsController : ControllerBase
     }
 
     [HttpDelete("{id:long}")]
-    public IActionResult DeleteById([FromRoute] long id)
+    public async Task<IActionResult> DeleteById([FromRoute] long id)
     {
        if(id <= 0)
            throw new ArgumentOutOfRangeException(nameof(id), "id must be greater than zero");
      
          
-       var studentDeleted = _students.Delete(id);
-       return studentDeleted is null ? NotFound() : Ok(studentDeleted);
+       var studentDeleted = await _context.Students.FindAsync(id);
+       if (studentDeleted is null)
+           return NotFound();
+       _context.Students.Remove(studentDeleted);
+       await _context.SaveChangesAsync();
+       return NoContent();
 
-       
+
 
     }
 }

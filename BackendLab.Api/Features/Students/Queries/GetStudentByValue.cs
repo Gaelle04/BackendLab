@@ -3,7 +3,7 @@ using MediatR;
 
 namespace BackendLab.Api.Features.Students.Queries;
 
-public class GetStudentByValue : IRequest<IEnumerable<Student>>
+public class GetStudentByValue : IRequest<IEnumerable<OldStudent>>
 {
    public string Value { get; }
 
