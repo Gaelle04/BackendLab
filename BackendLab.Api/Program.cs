@@ -1,6 +1,8 @@
 using BackendLab.Api.Models;
 using BackendLab.Api.Controllers;
 using BackendLab.Api.Services; 
+using BackendLab.Api.Middleware;
+using BackendLab.Api.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddSingleton<IStudentService, StudentService>();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<HeaderFilter>();
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -19,6 +25,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseMiddleware<HelloMiddleware>();
 app.MapControllers();
 
 
